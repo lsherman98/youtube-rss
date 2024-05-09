@@ -2,7 +2,6 @@
 import inquirer from "inquirer";
 import { addToRSS, downloadMP3, getUrl, isYouTubeURL, setup } from "./utils.js";
 
-
 const choice = await inquirer.prompt({
     name: 'entry',
     message: 'What would you like to do?',
