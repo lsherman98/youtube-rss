@@ -20,7 +20,7 @@ You can install the tool by running:
 
 ```
 
-npm i yt-rss -g
+npm i ytrss -g
 
 ```
 
@@ -34,7 +34,7 @@ npm i -g
 
   
 
-You should then be able to run the tool from anywhere by simply running ```yt-rss``` in your terminal.
+You should then be able to run the tool from anywhere by simply running ```ytrss``` in your terminal.
 
   
 
