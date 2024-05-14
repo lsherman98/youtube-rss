@@ -184,6 +184,7 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
             },
         })
         .catch((err) => "Error Uploading File");
+    unlinkSync(`${process.cwd()}/rss_feed.xml`);
     console.log(`Added to RSS - `, publicUrl);
 }
 
@@ -237,4 +238,5 @@ export async function connectToGoogleDrive(name) {
     const xml = feed.buildXml();
     writeFileSync("./rss_feed.xml", xml);
     await uploadFile().catch((err) => "Error Uploading File");
+    unlinkSync(`${process.cwd()}/rss_feed.xml`);
 }
