@@ -7,9 +7,13 @@ import ora from "ora";
 import { join } from "path";
 import Parser from "rss-parser";
 import { Podcast } from "podcast";
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config();
 
 export async function setup() {
     console.clear();
@@ -27,7 +31,11 @@ export async function setup() {
     });
 
     if (hostingService.hosting === "Google Cloud") {
-        process.env.BUCKET_NAME = `${name.name}-youtube-rss`
+        process.env.BUCKET_NAME = `${name.name}-youtube-rss`;
+        writeFileSync(
+            `${__dirname}/.env`,
+            `BUCKET_NAME='${process.env.BUCKET_NAME}'`
+        );
         await connectToGoogleDrive(name.name);
         await getUrl();
     }
@@ -43,7 +51,6 @@ export async function getUrl() {
         });
         return url;
     };
-    
 
     let url = await getUrlInput();
     while (!isYouTubeURL(url.url)) {
@@ -70,7 +77,7 @@ export async function getUrl() {
 export async function downloadMP3(url) {
     try {
         const logger = createLogger({
-            storagePath: join(process.cwd(), ".progress-estimator"),
+            storagePath: join(__dirname, ".progress-estimator"),
         });
 
         const options = {
@@ -83,23 +90,24 @@ export async function downloadMP3(url) {
             dumpSingleJson: true,
             "audio-format": "mp3",
             "audio-quality": "0",
+            output: __dirname,
         });
-        let duration
+        let duration;
         if (info.duration_string) {
-            const durationArr = info.duration_string.split(":")
-            if (durationArr.length === 3){
-                duration = parseInt(durationArr[0] * 60)
+            const durationArr = info.duration_string.split(":");
+            if (durationArr.length === 3) {
+                duration = parseInt(durationArr[0] * 60);
             } else {
                 duration = parseInt(durationArr[0]);
             }
         } else {
-            duration = 1
+            duration = 1;
         }
 
         const promise = youtubedl(url, options);
 
         await logger(promise, `Downloading audio from ${url}`, {
-            estimate: duration * 1300
+            estimate: duration * 1300,
         });
     } catch (error) {
         console.error("Error downloading audio:", error);
@@ -113,9 +121,9 @@ export async function uploadMP3() {
         const bucketName = process.env.BUCKET_NAME;
         const storage = new Storage();
         const bucket = storage.bucket(bucketName);
-        const files = readdirSync(process.cwd());
+        const files = readdirSync(__dirname);
         const mp3File = files.find((file) => file.endsWith(".mp3"));
-        const filePath = `${process.cwd()}/${mp3File}`;
+        const filePath = `${__dirname}/${mp3File}`;
         spinner.start();
         const res = await bucket.upload(filePath, { public: true });
         const upload = bucket.file(res[0].metadata.name);
@@ -174,8 +182,8 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
     });
 
     const xml = newFeed.buildXml();
-    writeFileSync("./rss_feed.xml", xml);
-    const cwd = process.cwd();
+    writeFileSync(`${__dirname}/rss_feed.xml`, xml);
+    const cwd = __dirname;
     await bucket
         .upload(`${cwd}/rss_feed.xml`, {
             public: true,
@@ -184,7 +192,7 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
             },
         })
         .catch((err) => "Error Uploading File");
-    unlinkSync(`${process.cwd()}/rss_feed.xml`);
+    unlinkSync(`${__dirname}/rss_feed.xml`);
     console.log(`Added to RSS - `, publicUrl);
 }
 
@@ -211,9 +219,9 @@ export async function connectToGoogleDrive(name) {
 
     async function uploadFile() {
         const bucket = storage.bucket(bucketName);
-        const cwd = process.cwd();
+        const cwd = __dirname;
         await bucket
-            .upload(`${cwd}/rss_feed.xml`, {
+            .upload(`${__dirname}/rss_feed.xml`, {
                 public: true,
                 metadata: {
                     cacheControl:
@@ -238,5 +246,5 @@ export async function connectToGoogleDrive(name) {
     const xml = feed.buildXml();
     writeFileSync("./rss_feed.xml", xml);
     await uploadFile().catch((err) => "Error Uploading File");
-    unlinkSync(`${process.cwd()}/rss_feed.xml`);
+    unlinkSync(`${__dirname}/rss_feed.xml`);
 }
