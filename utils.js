@@ -244,7 +244,7 @@ export async function connectToGoogleDrive(name) {
     });
 
     const xml = feed.buildXml();
-    writeFileSync("./rss_feed.xml", xml);
+    writeFileSync(`${__dirname}/rss_feed.xml`, xml);
     await uploadFile().catch((err) => "Error Uploading File");
     unlinkSync(`${__dirname}/rss_feed.xml`);
 }
