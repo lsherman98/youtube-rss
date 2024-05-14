@@ -7,6 +7,9 @@ import ora from "ora";
 import { join } from "path";
 import Parser from "rss-parser";
 import { Podcast } from "podcast";
+import dotenv from 'dotenv'
+dotenv.config()
+
 
 export async function setup() {
     console.clear();
@@ -24,6 +27,7 @@ export async function setup() {
     });
 
     if (hostingService.hosting === "Google Cloud") {
+        process.env.BUCKET_NAME = `${name.name}-youtube-rss`
         await connectToGoogleDrive(name.name);
         await getUrl();
     }
@@ -106,7 +110,7 @@ export async function uploadMP3() {
     async function uploadFile() {
         const spinner = ora("Uploading...");
 
-        const bucketName = "levi-youtube-rss";
+        const bucketName = process.env.BUCKET_NAME;
         const storage = new Storage();
         const bucket = storage.bucket(bucketName);
         const files = readdirSync(process.cwd());
