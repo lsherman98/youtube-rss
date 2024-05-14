@@ -3,7 +3,7 @@
 
   
 
-This tool accepts a link to a youtube video, converts it to MP3 and then add it to a private RSS feed that you can subscribe to in your podcast app of choice.
+This tool accepts a link to a youtube video, converts it to MP3 and then adds it to a private RSS feed that you can subscribe to in your podcast app of choice.
 
   
 
