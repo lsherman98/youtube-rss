@@ -13,7 +13,7 @@ import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config();
+dotenv.config({ path: __dirname + "/.env" });
 
 export async function setup() {
     console.clear();
@@ -84,13 +84,13 @@ export async function downloadMP3(url) {
             x: true,
             "audio-format": "mp3",
             "audio-quality": "0",
+            "path": __dirname,
         };
 
         const info = await youtubedl(url, {
             dumpSingleJson: true,
             "audio-format": "mp3",
             "audio-quality": "0",
-            output: __dirname,
         });
         let duration;
         if (info.duration_string) {
@@ -135,7 +135,7 @@ export async function uploadMP3() {
         await addToRSS(url, metadata, bucketName);
     }
 
-    await uploadFile().catch((err) => "Error Uploading File");
+    await uploadFile().catch((err) => console.log("Error Uploading File"));
 }
 
 export async function addToRSS(publicUrlAudio, metadata, bucketName) {
@@ -191,7 +191,7 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
                 cacheControl: "no-store, no-cache, max-age=0, must-revalidate",
             },
         })
-        .catch((err) => "Error Uploading File");
+        .catch((err) => console.log("Error Uploading XML"));
     unlinkSync(`${__dirname}/rss_feed.xml`);
     console.log(`Added to RSS - `, publicUrl);
 }
@@ -229,7 +229,7 @@ export async function connectToGoogleDrive(name) {
                 },
             })
             .then(() => console.log(`File uploaded.`))
-            .catch((err) => "Problem Uploading File");
+            .catch((err) => err);
     }
 
     await createBucket();
@@ -245,6 +245,6 @@ export async function connectToGoogleDrive(name) {
 
     const xml = feed.buildXml();
     writeFileSync(`${__dirname}/rss_feed.xml`, xml);
-    await uploadFile().catch((err) => "Error Uploading File");
+    await uploadFile().catch((err) => {"Error Uploading XML"; process.exit()});
     unlinkSync(`${__dirname}/rss_feed.xml`);
 }
