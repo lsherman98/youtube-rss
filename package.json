@@ -1,11 +1,11 @@
 {
-  "name": "ytrss",
-  "version": "1.0.7",
+  "name": "yt-rss",
+  "version": "1.0.1",
   "main": "main.js",
   "type": "module",
   "scripts": {},
   "bin": {
-    "ytrss": "main.js"
+    "yt-rss": "main.js"
   },
   "keywords": [],
   "author": "",
