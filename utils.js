@@ -31,7 +31,7 @@ export async function setup() {
     });
 
     if (hostingService.hosting === "Google Cloud") {
-        process.env.BUCKET_NAME = `${name.name}-youtube-rss`;
+        process.env.BUCKET_NAME = `${name.name.toLowerCase()}-youtube-rss`;
         writeFileSync(
             `${__dirname}/.env`,
             `BUCKET_NAME='${process.env.BUCKET_NAME}'`
@@ -135,7 +135,17 @@ export async function uploadMP3() {
         await addToRSS(url, metadata, bucketName);
     }
 
-    await uploadFile().catch((err) => console.log("Error Uploading File"));
+    await uploadFile().catch((err) => {
+        const files = readdirSync(__dirname);
+        const mp3File = files.find((file) => file.endsWith(".mp3"));
+        const filePath = `${__dirname}/${mp3File}`;
+        unlinkSync(filePath);
+        console.log("Error Uploading File")
+        process.exit()
+    });
+
+
+    
 }
 
 export async function addToRSS(publicUrlAudio, metadata, bucketName) {
@@ -191,7 +201,7 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
                 cacheControl: "no-store, no-cache, max-age=0, must-revalidate",
             },
         })
-        .catch((err) => console.log("Error Uploading XML"));
+        .catch((err) => { unlinkSync(`${__dirname}/rss_feed.xml`); console.log("Error Uploading XML"); process.exit();});
     unlinkSync(`${__dirname}/rss_feed.xml`);
     console.log(`Added to RSS - `, publicUrl);
 }
@@ -245,6 +255,6 @@ export async function connectToGoogleDrive(name) {
 
     const xml = feed.buildXml();
     writeFileSync(`${__dirname}/rss_feed.xml`, xml);
-    await uploadFile().catch((err) => {"Error Uploading XML"; process.exit()});
+    await uploadFile().catch((err) => {console.log("Error Uploading XML"); unlinkSync(`${__dirname}/rss_feed.xml`); process.exit()});
     unlinkSync(`${__dirname}/rss_feed.xml`);
 }

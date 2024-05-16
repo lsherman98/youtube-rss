@@ -78,3 +78,7 @@ If you installed the package globally using npm you can find where the global mo
 * Upgraded user experience
 
 * Give users option to carry over previous rss feed file if running setup again.
+
+* Avoid naming conflicts when creating GCP buckets.
+
+* Auto run hosting login if needed.
