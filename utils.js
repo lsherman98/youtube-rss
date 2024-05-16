@@ -160,7 +160,7 @@ export async function addToRSS(publicUrlAudio, metadata, bucketName) {
         title: parsedFeed.title,
         description: parsedFeed.description,
         feedUrl: publicUrl,
-        siteUrl: "github.com/lsherman98",
+        siteUrl: "github.com/lsherman98/youtube-rss",
         author: bucketName.split("-")[0],
         docs: "github.com/lsherman98/youtube-rss",
     });
@@ -248,7 +248,7 @@ export async function connectToGoogleDrive(name) {
         title: `${name}'s RSS Feed`,
         description: "A private RSS feed using youtube-rss.",
         feedUrl: `https://storage.googleapis.com/${name}-youtube-rss/rss_feed.xml`,
-        siteUrl: "github.com/lsherman98",
+        siteUrl: "github.com/lsherman98/youtube-rss",
         author: name,
         docs: "github.com/lsherman98/youtube-rss",
     });
